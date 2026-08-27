@@ -1,0 +1,2 @@
+# PS4-MACWriter
+PS4コントローラーのMACアドレスを書き換えるコンソールアプリです。Linuxで動作するバイナリとwindows用のexeを用意しています。
