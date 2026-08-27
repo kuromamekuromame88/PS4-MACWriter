@@ -35,6 +35,11 @@ jobs:
             libusb-1.0-0-dev \
             pkg-config
 
+      - name: check file
+        if: runner.os == 'Linux'
+        run: |
+          cd
+
       - name: Build (Ubuntu)
         if: runner.os == 'Linux'
         run: |
@@ -57,6 +62,11 @@ jobs:
             -OutFile "libusb.7z"
 
           7z x libusb.7z -olibusb
+
+      - name: check file
+        if: runner.os == 'Linux'
+        run: |
+          dir
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
