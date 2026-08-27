@@ -44,7 +44,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           g++ -std=c++17 \
-            /src/PS4PairTool.cpp \
+            PS4PairTool.cpp \
             -o PS4PairTool \
             $(pkg-config --cflags --libs libusb-1.0)
 
@@ -76,7 +76,7 @@ jobs:
 
           g++ -std=c++17 `
             -I"$libusb\include\libusb-1.0" `
-            /src/PS4PairTool.cpp `
+            PS4PairTool.cpp `
             -L"$libusb\MinGW64\static" `
             -lusb-1.0 `
             -o PS4PairTool.exe
