@@ -1,0 +1,81 @@
+name: Build PS4PairTool
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: PS4PairTool-linux-x86_64
+            executable: PS4PairTool
+          - os: windows-latest
+            artifact_name: PS4PairTool-windows-x86_64
+            executable: PS4PairTool.exe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -------------------------
+      # Ubuntu
+      # -------------------------
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            g++ \
+            libusb-1.0-0-dev \
+            pkg-config
+
+      - name: Build (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          g++ -std=c++17 \
+            /src/PS4PairTool.cpp \
+            -o PS4PairTool \
+            $(pkg-config --cflags --libs libusb-1.0)
+
+      # -------------------------
+      # Windows
+      # -------------------------
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install mingw -y
+
+          Invoke-WebRequest `
+            -Uri "https://github.com/libusb/libusb/releases/download/v1.0.29/libusb-1.0.29.7z" `
+            -OutFile "libusb.7z"
+
+          7z x libusb.7z -olibusb
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $libusb = Resolve-Path ".\libusb"
+
+          g++ -std=c++17 `
+            -I"$libusb\include\libusb-1.0" `
+            /src/PS4PairTool.cpp `
+            -L"$libusb\MinGW64\static" `
+            -lusb-1.0 `
+            -o PS4PairTool.exe
+
+      # -------------------------
+      # Upload artifact
+      # -------------------------
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.executable }}
